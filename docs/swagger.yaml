@@ -1,0 +1,64 @@
+definitions:
+  models.Article:
+    type: object
+info:
+  contact: {}
+paths:
+  /articles:
+    get:
+      description: Возвращает список статей с пагинацией и поиском
+      parameters:
+      - default: 1
+        description: Номер страницы
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Кол-во на странице
+        in: query
+        name: limit
+        type: integer
+      - description: Поиск по заголовку или тексту
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Article'
+            type: array
+      summary: Получить список статей
+      tags:
+      - articles
+    post:
+      consumes:
+      - application/json
+      description: Создаёт новую статью в блоге
+      parameters:
+      - description: Данные статьи
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/models.Article'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Article'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Создать новую статью
+      tags:
+      - articles
+swagger: "2.0"
