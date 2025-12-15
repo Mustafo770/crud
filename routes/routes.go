@@ -6,8 +6,8 @@ import (
     "github.com/gin-gonic/gin"
     "github.com/swaggo/gin-swagger"
     "github.com/swaggo/files"
-    _ "github.com/mustafchon/blog-api/docs" 
-    "github.com/mustafchon/blog-api/controllers"
+    _ "github.com/Mustafo770/blog-api/docs" 
+    "github.com/Mustafo770/blog-api/controllers"
 )
 
 // SetupRouter — главная функция, которая настраивает все маршруты

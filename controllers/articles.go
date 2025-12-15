@@ -5,8 +5,8 @@ import (
     "strconv"
 
     "github.com/gin-gonic/gin"
-    "github.com/mustafchon/blog-api/database"
-    "github.com/mustafchon/blog-api/models"
+    "github.com/Mustafo770/blog-api/database"
+    "github.com/Mustafo770/blog-api/models"
     "gorm.io/gorm/clause"
 )
 

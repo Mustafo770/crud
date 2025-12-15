@@ -1,4 +1,4 @@
-module github.com/mustafchon/blog-api
+module github.com/Mustafo770/blog-api
 
 go 1.25.1
 
