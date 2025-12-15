@@ -29,7 +29,7 @@ func CreateArticle(c *gin.Context) {
         return
     }
     
-    // Сохраняем статью в базу данных
+  
     database.DB.Create(&article)
     
     // Возвращаем созданную статью клиенту
@@ -56,9 +56,8 @@ func GetArticles(c *gin.Context) {
 
     page, _ := strconv.Atoi(pageStr)
     limit, _ := strconv.Atoi(limitStr)
-    offset := (page - 1) * limit  // С какой записи начинать
-
-    // Начинаем строить запрос к базе
+    offset := (page - 1) * limit  
+   
     query := database.DB.Offset(offset).Limit(limit)
 
     // Если есть поиск — ищем по заголовку или содержимому

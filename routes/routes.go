@@ -1,7 +1,5 @@
-// package routes — имя папки, чтобы другие файлы знали, где искать этот код
 package routes
 
-// Импортируем нужные библиотеки
 import (
     "github.com/gin-gonic/gin"
     "github.com/swaggo/gin-swagger"
@@ -17,7 +15,7 @@ func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
 	// Добавляем Swagger по адресу /swagger/index.html
-	// После запуска сервера зайди в браузер: http://localhost:8080/swagger/index.html
+	// http://localhost:8080/swagger/index.html
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// Тестовый маршрут на главную страницу (тот, что ты сейчас видишь)
@@ -29,14 +27,13 @@ func SetupRouter() *gin.Engine {
 		})
 	})
 
-	// Здесь позже добавим маршруты для статей, комментариев и т.д.
-
+	
 	// Группа маршрутов для статей
 	articles := r.Group("/articles")
 	{
 		articles.POST("/", controllers.CreateArticle) // Создать статью
 		articles.GET("/", controllers.GetArticles)    // Список статей с пагинацией и поиском
-		// Позже добавим GET /:id, PUT, DELETE
+		
 	}
 
 	return r
