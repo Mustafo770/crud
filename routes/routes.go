@@ -1,11 +1,11 @@
 package routes
 
 import (
-    "github.com/gin-gonic/gin"
-    "github.com/swaggo/gin-swagger"
-    "github.com/swaggo/files"
-    _ "github.com/Mustafo770/blog-api/docs" 
-    "github.com/Mustafo770/blog-api/controllers"
+	"github.com/Mustafo770/blog-api/controllers"
+	_ "github.com/Mustafo770/blog-api/docs"
+	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // SetupRouter — главная функция, которая настраивает все маршруты
@@ -27,14 +27,32 @@ func SetupRouter() *gin.Engine {
 		})
 	})
 
-	
 	// Группа маршрутов для статей
-	articles := r.Group("/articles")
-	{
-		articles.POST("/", controllers.CreateArticle) // Создать статью
-		articles.GET("/", controllers.GetArticles)    // Список статей с пагинацией и поиском
-		
-	}
+	// Комментарии привязаны к статье — делаем вложенный маршрут
+articles := r.Group("/articles")
+{
+    articles.POST("/", controllers.CreateArticle)
+    articles.GET("/", controllers.GetArticles)
+    articles.GET("/:id", controllers.GetArticle)
+    articles.PUT("/:id", controllers.UpdateArticle)
+    articles.DELETE("/:id", controllers.DeleteArticle)
 
+    // Вложенная группа: комментарии к конкретной статье
+    articles.GET("/:id/comments", controllers.GetComments)       // Список комментариев к статье
+    articles.POST("/:id/comments", controllers.CreateComment)    // Создать комментарий к статье
+}
+
+// Отдельный маршрут для удаления комментария по его ID
+comments := r.Group("/comments")
+{
+    comments.POST("/", controllers.CreateComment)
+    comments.GET("/", controllers.GetComments) // Теперь GET /comments?article_id=123
+    comments.DELETE("/:id", controllers.DeleteComment)
+}
+
+	likes := r.Group("/likes")
+	{
+		likes.POST("/", controllers.ToggleLike)
+	}
 	return r
 }

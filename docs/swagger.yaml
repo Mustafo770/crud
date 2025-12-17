@@ -1,6 +1,10 @@
 definitions:
   models.Article:
     type: object
+  models.Comment:
+    type: object
+  models.Like:
+    type: object
 info:
   contact: {}
 paths:
@@ -61,4 +65,183 @@ paths:
       summary: Создать новую статью
       tags:
       - articles
+  /articles/{id}:
+    delete:
+      description: Удаляет статью и все её комментарии по ID
+      parameters:
+      - description: ID статьи
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Удалить статью
+      tags:
+      - articles
+    get:
+      description: Возвращает статью по ID с комментариями и лайками
+      parameters:
+      - description: ID статьи
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Article'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить одну статью
+      tags:
+      - articles
+    put:
+      consumes:
+      - application/json
+      description: Обновляет заголовок и содержание статьи по ID
+      parameters:
+      - description: ID статьи
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новые данные
+        in: body
+        name: article
+        required: true
+        schema:
+          $ref: '#/definitions/models.Article'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Article'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Обновить статью
+      tags:
+      - articles
+  /comments:
+    post:
+      consumes:
+      - application/json
+      description: Добавляет комментарий к статье
+      parameters:
+      - description: Текст и ID статьи
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/models.Comment'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Comment'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Добавить комментарий
+      tags:
+      - comments
+  /comments/{article_id}:
+    get:
+      description: Возвращает все комментарии к статье
+      parameters:
+      - description: ID статьи
+        in: path
+        name: article_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Comment'
+            type: array
+      summary: Получить комментарии статьи
+      tags:
+      - comments
+  /comments/{id}:
+    delete:
+      description: Удаляет комментарий по ID
+      parameters:
+      - description: ID комментария
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Удалить комментарий
+      tags:
+      - comments
+  /likes:
+    post:
+      consumes:
+      - application/json
+      description: Если лайк есть — снимает, если нет — ставит (по user_id и article_id)
+      parameters:
+      - description: user_id и article_id
+        in: body
+        name: like
+        required: true
+        schema:
+          $ref: '#/definitions/models.Like'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Поставить/снять лайк
+      tags:
+      - likes
 swagger: "2.0"

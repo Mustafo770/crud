@@ -67,8 +67,84 @@ func GetArticles(c *gin.Context) {
     }
 
     // Загружаем статьи + связанные комментарии и лайки
-    query.Preload(clause.Associations).Find(&articles)
-
+    query.Preload(clause.Associations).Find(&articles)  // подгрузит и Comments, и Likes
     // Возвращаем список
     c.JSON(http.StatusOK, articles)
+}
+// GetArticle godoc
+// @Summary      Получить одну статью
+// @Description  Возвращает статью по ID с комментариями и лайками
+// @Tags         articles
+// @Produce      json
+// @Param        id path int true "ID статьи"
+// @Success      200 {object} models.Article
+// @Failure      404 {object} map[string]string
+// @Router       /articles/{id} [get]
+func GetArticle(c *gin.Context) {
+    id := c.Param("id")
+    var article models.Article
+
+    // Ищем статью по ID и загружаем связанные данные
+    if err := database.DB.Preload(clause.Associations).First(&article, id).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Статья не найдена"})
+        return
+    }
+
+    c.JSON(http.StatusOK, article)
+}
+
+// UpdateArticle godoc
+// @Summary      Обновить статью
+// @Description  Обновляет заголовок и содержание статьи по ID
+// @Tags         articles
+// @Accept       json
+// @Produce      json
+// @Param        id path int true "ID статьи"
+// @Param        article body models.Article true "Новые данные"
+// @Success      200 {object} models.Article
+// @Failure      400,404 {object} map[string]string
+// @Router       /articles/{id} [put]
+func UpdateArticle(c *gin.Context) {
+    id := c.Param("id")
+    var article models.Article
+
+    // Сначала находим статью
+    if err := database.DB.First(&article, id).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Статья не найдена"})
+        return
+    }
+
+    // Читаем новые данные из JSON
+    if err := c.ShouldBindJSON(&article); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Неверные данные"})
+        return
+    }
+
+    // Сохраняем изменения
+    database.DB.Save(&article)
+
+    c.JSON(http.StatusOK, article)
+}
+
+// DeleteArticle godoc
+// @Summary      Удалить статью
+// @Description  Удаляет статью и все её комментарии по ID
+// @Tags         articles
+// @Param        id path int true "ID статьи"
+// @Success      200 {object} map[string]string
+// @Failure      404 {object} map[string]string
+// @Router       /articles/{id} [delete]
+func DeleteArticle(c *gin.Context) {
+    id := c.Param("id")
+    var article models.Article
+
+    if err := database.DB.First(&article, id).Error; err != nil {
+        c.JSON(http.StatusNotFound, gin.H{"error": "Статья не найдена"})
+        return
+    }
+
+    // Удаляем статью (каскадно удалятся комментарии и лайки благодаря GORM)
+    database.DB.Delete(&article)
+
+    c.JSON(http.StatusOK, gin.H{"message": "Статья успешно удалена"})
 }
