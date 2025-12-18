@@ -24,15 +24,12 @@ func ToggleLike(c *gin.Context) {
     }
 
     var existing models.Like
-    // Ищем существующий лайк
     result := database.DB.Where("user_id = ? AND article_id = ?", input.UserID, input.ArticleID).First(&existing)
 
     if result.Error == nil {
-        // Лайк есть — удаляем
         database.DB.Delete(&existing)
         c.JSON(http.StatusOK, gin.H{"message": "Лайк снят"})
     } else {
-        // Лайка нет — создаём
         database.DB.Create(&input)
         c.JSON(http.StatusOK, gin.H{"message": "Лайк поставлен"})
     }

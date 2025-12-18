@@ -4,21 +4,21 @@ package models
 import "gorm.io/gorm"
 
 type Article struct {
-    gorm.Model  // Добавляет ID, CreatedAt и т.д.
+    gorm.Model  
     Title       string
     Content     string
-    Comments    []Comment `gorm:"foreignKey:ArticleID"` // Связь с комментариями
-    Likes       []Like    `gorm:"foreignKey:ArticleID"` // Связь с лайками
+    Comments    []Comment `gorm:"foreignKey:ArticleID"` 
+    Likes       []Like    `gorm:"foreignKey:ArticleID"` 
 }
 
 type Comment struct {
     gorm.Model
     Text       string
-    ArticleID  uint // Привязка к статье
+    ArticleID  uint 
 }
 
 type Like struct {
     gorm.Model
-    UserID     uint // Предполагаем, что есть пользователи (для простоты — просто ID)
+    UserID     uint 
     ArticleID  uint
 }

@@ -9,8 +9,6 @@ import (
 func main() {
 	
 	database.Connect()
-
-	// Автоматически создаём таблицы в базе по нашим моделям
 	database.DB.AutoMigrate(&models.Article{}, &models.Comment{}, &models.Like{})
 
 	router := routes.SetupRouter()

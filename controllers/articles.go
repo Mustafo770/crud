@@ -22,8 +22,6 @@ import (
 // @Router       /articles [post]
 func CreateArticle(c *gin.Context) {
     var article models.Article
-    
-    // Читаем JSON из тела запроса (то, что прислал пользователь)
     if err := c.ShouldBindJSON(&article); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Неверные данные"})
         return
@@ -31,8 +29,6 @@ func CreateArticle(c *gin.Context) {
     
   
     database.DB.Create(&article)
-    
-    // Возвращаем созданную статью клиенту
     c.JSON(http.StatusOK, article)
 }
 
@@ -49,7 +45,6 @@ func CreateArticle(c *gin.Context) {
 func GetArticles(c *gin.Context) {
     var articles []models.Article
 
-    // Читаем параметры из URL: ?page=1&limit=10&search=go
     pageStr := c.DefaultQuery("page", "1")
     limitStr := c.DefaultQuery("limit", "10")
     search := c.Query("search")
@@ -60,15 +55,12 @@ func GetArticles(c *gin.Context) {
    
     query := database.DB.Offset(offset).Limit(limit)
 
-    // Если есть поиск — ищем по заголовку или содержимому
     if search != "" {
         searchPattern := "%" + search + "%"
         query = query.Where("title LIKE ? OR content LIKE ?", searchPattern, searchPattern)
     }
 
-    // Загружаем статьи + связанные комментарии и лайки
-    query.Preload(clause.Associations).Find(&articles)  // подгрузит и Comments, и Likes
-    // Возвращаем список
+    query.Preload(clause.Associations).Find(&articles) 
     c.JSON(http.StatusOK, articles)
 }
 // GetArticle godoc
@@ -84,7 +76,6 @@ func GetArticle(c *gin.Context) {
     id := c.Param("id")
     var article models.Article
 
-    // Ищем статью по ID и загружаем связанные данные
     if err := database.DB.Preload(clause.Associations).First(&article, id).Error; err != nil {
         c.JSON(http.StatusNotFound, gin.H{"error": "Статья не найдена"})
         return
@@ -108,19 +99,16 @@ func UpdateArticle(c *gin.Context) {
     id := c.Param("id")
     var article models.Article
 
-    // Сначала находим статью
     if err := database.DB.First(&article, id).Error; err != nil {
         c.JSON(http.StatusNotFound, gin.H{"error": "Статья не найдена"})
         return
     }
 
-    // Читаем новые данные из JSON
     if err := c.ShouldBindJSON(&article); err != nil {
         c.JSON(http.StatusBadRequest, gin.H{"error": "Неверные данные"})
         return
     }
 
-    // Сохраняем изменения
     database.DB.Save(&article)
 
     c.JSON(http.StatusOK, article)
@@ -143,7 +131,7 @@ func DeleteArticle(c *gin.Context) {
         return
     }
 
-    // Удаляем статью (каскадно удалятся комментарии и лайки благодаря GORM)
+   
     database.DB.Delete(&article)
 
     c.JSON(http.StatusOK, gin.H{"message": "Статья успешно удалена"})
